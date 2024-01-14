@@ -1,0 +1,106 @@
+# Contributor: Matthias Neugebauer <mtneug@mailbox.org>
+# Contributor: omni <omni+alpine@hack.org>
+# Contributor: Dermot Bradley <dermot_bradley@yahoo.com>
+# Contributor: Justin C. Miller <justin@justin.cm>
+# Maintainer: Justin C. Miller <justin@justin.cm>
+pkgname=nomad
+pkgver=1.7.2
+# remember to update _gitcommit to revision of the release
+_gitcommit=64e3dca
+pkgrel=0
+pkgdesc="easy-to-use, flexible, and performant workload orchestrator"
+url="https://www.nomadproject.io/"
+arch="x86_64"
+license="BSL"
+depends="
+	cni-plugins
+	"
+makedepends="
+	bash
+	go
+	go-bindata-assetfs
+	linux-headers
+	make
+	"
+subpackages="
+	$pkgname-openrc
+	"
+options="net !check" # cannot produce environment for testing in CI
+source="$pkgname-$pkgver.tar.gz::https://github.com/hashicorp/nomad/archive/v$pkgver.tar.gz
+	nomad.initd
+	nomad.confd
+	server.hcl
+	"
+
+# secfixes:
+#   1.4.8-r0:
+#     - CVE-2023-24534
+#   1.4.6-r0:
+#     - CVE-2023-1296
+#   1.3.1-r0:
+#     - CVE-2022-30324
+#   1.2.6-r0:
+#     - CVE-2022-24683
+#     - CVE-2022-24684
+#     - CVE-2022-24685
+#     - CVE-2022-24686
+#     - CVE-2021-44716
+#     - CVE-2021-44717
+#     - CVE-2021-43415
+#     - CVE-2021-37218
+#   1.1.1-r0:
+#     - CVE-2021-32575
+#   1.0.4-r0:
+#     - CVE-2021-3283
+#   0.12.7-r0:
+#     - CVE-2020-28348
+#     - CVE-2020-27195
+#   0.11.1-r0:
+#     - CVE-2020-10944
+#   0.10.3-r0:
+#     - CVE-2020-7218
+#   0.9.6-r0:
+#     - CVE-2019-12741
+#     - CVE-2019-15928
+#     - CVE-2019-16742
+#   0.9.5-r0:
+#     - CVE-2019-14802
+#     - CVE-2019-14803
+#   0.9.2-r0:
+#     - CVE-2019-12618
+
+export GOFLAGS="$GOFLAGS -trimpath -mod=readonly -modcacherw"
+export GIT_COMMIT="$_gitcommit"
+export GOCACHE="${GOCACHE:-"$srcdir/go-cache"}"
+export GOTMPDIR="${GOTMPDIR:-"$srcdir"}"
+export GOMODCACHE="${GOMODCACHE:-"$srcdir/go"}"
+
+build() {
+	go build -v -o bin/"$pkgname" \
+		-ldflags "-X github.com/hashicorp/nomad/version.GitCommit='$pkgver'" \
+		-tags "ui release"
+}
+
+check() {
+	go test -timeout=15m "./..."
+}
+
+package() {
+	install -m755 -D "$srcdir"/"$pkgname".initd "$pkgdir"/etc/init.d/"$pkgname"
+	install -m644 -D "$srcdir"/"$pkgname".confd "$pkgdir"/etc/conf.d/"$pkgname"
+
+	install -m755 -d "$pkgdir"/etc/cni
+	install -m755 -d "$pkgdir"/usr/lib/"$pkgname"/plugins
+
+	install -m755 -o root -g root -D bin/"$pkgname" "$pkgdir"/usr/sbin/"$pkgname"
+	install -m640 -o root -g root -D "$srcdir"/server.hcl "$pkgdir"/etc/nomad.d/server.hcl
+	install -m750 -o root -g root -d "$pkgdir"/var/lib/"$pkgname"
+}
+
+
+sha512sums="
+7192c4440a632a8841c41f541725e903f9a8901c56b9a6323e8f4b6cd46e28bc1149874dac21ca4512eeaab36968170835e1a9d9b6f1eb6521b71ed68a1fda76  nomad-1.7.2.tar.gz
+0fb61ed6d02990536f08f08bf3d3dcc074be9ffda3ad99838b09fe342674480f2229827715200770e43f147bd5ddc7326b6c982c14bce864f4e05d118481fc1c  nomad.initd
+b6d8960f7e7e0c985c77fc4ee54b16210fec88082d592696b4a3f885e1f6cd1138d7d376e6e86b0a91c94e2b7354472a98905f9fa6cfe136a618e00eff57e47a  nomad.confd
+ba36908854fdeea4db17381378d1d3ba5762c5e13cb1fa9c693e9e383fa8cfa05193be08a6e3d85397ba233c733daa6f91bec7b2ddb23a52c86eabcafd35bb88  server.hcl
+"
