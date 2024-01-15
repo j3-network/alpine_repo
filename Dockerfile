@@ -1,4 +1,4 @@
-FROM alpine:edge as builder
+FROM alpine:3.19 as builder
 
 RUN adduser -D j3 && addgroup j3 abuild
 RUN apk add --no-cache doas build-base alpine-sdk

@@ -4,9 +4,9 @@
 # Contributor: Justin C. Miller <justin@justin.cm>
 # Maintainer: Justin C. Miller <justin@justin.cm>
 pkgname=nomad
-pkgver=1.7.2
+pkgver=1.6.5
 # remember to update _gitcommit to revision of the release
-_gitcommit=64e3dca
+_gitcommit=a7cfff3
 pkgrel=0
 pkgdesc="easy-to-use, flexible, and performant workload orchestrator"
 url="https://www.nomadproject.io/"
@@ -99,7 +99,7 @@ package() {
 
 
 sha512sums="
-7192c4440a632a8841c41f541725e903f9a8901c56b9a6323e8f4b6cd46e28bc1149874dac21ca4512eeaab36968170835e1a9d9b6f1eb6521b71ed68a1fda76  nomad-1.7.2.tar.gz
+c4746520be7c7d3677f64ac1517f8fdea0643cfff13d8ade0b7f50d277e9ac7233f97fbb406ec7e3875e86e7cad31060e49c4216da6330e8786fdab072ee68a0  nomad-1.6.5.tar.gz
 0fb61ed6d02990536f08f08bf3d3dcc074be9ffda3ad99838b09fe342674480f2229827715200770e43f147bd5ddc7326b6c982c14bce864f4e05d118481fc1c  nomad.initd
 b6d8960f7e7e0c985c77fc4ee54b16210fec88082d592696b4a3f885e1f6cd1138d7d376e6e86b0a91c94e2b7354472a98905f9fa6cfe136a618e00eff57e47a  nomad.confd
 ba36908854fdeea4db17381378d1d3ba5762c5e13cb1fa9c693e9e383fa8cfa05193be08a6e3d85397ba233c733daa6f91bec7b2ddb23a52c86eabcafd35bb88  server.hcl
